@@ -1,48 +1,54 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {City} from './types';
 
-export const useCityAutocomplete = (
+const BASE_API_URL = 'https://nominatim.openstreetmap.org/search';
+
+export const useCitiesAutocomplete = (
   onChooseCity: (_lat: string, _lon: string) => void,
 ) => {
   const [query, setQuery] = useState<string>('');
   const [cities, setCities] = useState<City[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
   const isCityChosen = useRef(false);
 
-  const handleOnChangeText = useCallback((text: string) => {
+  const onChangeText = useCallback((text: string) => {
     isCityChosen.current = false;
+    if (text.length < 2) {
+      setIsLoading(false);
+    }
     setQuery(text);
   }, []);
 
   useEffect(() => {
-    let isMounted = true;
+    let isLatest = true;
     if (query.length < 2 || isCityChosen.current) return;
 
     const fetchCities = async () => {
       try {
+        setIsLoading(true);
         const response = await fetch(
-          `https://nominatim.openstreetmap.org/search?city=${query}&format=json&limit=5&accept-language=en`,
+          `${BASE_API_URL}?city=${query}&format=json&limit=5&accept-language=en`,
         );
         const data: City[] = await response.json();
-        // Only update if component is still mounted
-        if (isMounted) {
-          console.log('!!! citites ', data);
+        // Only update after latest request has response
+        if (isLatest) {
           setCities(data);
+          setIsLoading(false);
         }
       } catch (error) {
+        setIsLoading(false);
         console.error('Error fetching cities:', error);
       }
     };
     fetchCities();
 
     return () => {
-      isMounted = false;
+      isLatest = false;
     };
   }, [query]);
 
   const onCityPress = useCallback(
     (name: string, lat: string, lon: string) => {
-      console.log('!!! onCityPress lat, lon', name, lat, lon);
-
       isCityChosen.current = true;
       setQuery(name);
       onChooseCity(lat, lon);
@@ -53,8 +59,9 @@ export const useCityAutocomplete = (
 
   return {
     cities,
-    handleOnChangeText,
+    onChangeText,
     query,
     onCityPress,
+    isLoading,
   };
 };

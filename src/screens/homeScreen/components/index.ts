@@ -1,2 +1,2 @@
-export {ForecastData} from './forecastData';
-export {WeatherData} from './weatherData';
+export {ForecastInfo} from './forecastInfo';
+export {WeatherInfo} from './weatherInfo';

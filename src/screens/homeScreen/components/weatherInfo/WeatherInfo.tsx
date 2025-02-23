@@ -1,17 +1,8 @@
 import {StyleSheet, View} from 'react-native';
 import {Typography} from '../../../../ui';
+import {WeatherInfoProps} from './types';
 
-type WeatherDataProps = {
-  cityName: string;
-  countryName: string;
-  temperature: number;
-  humidity: number;
-  weatherDescription: string;
-  wind: number;
-};
-
-function WeatherData(props: WeatherDataProps) {
-  if (!props.cityName) return null;
+function WeatherInfo(props: WeatherInfoProps) {
   return (
     <View style={styles.weatherContainer}>
       <Typography style={styles.centerText} type="h2">
@@ -49,4 +40,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default WeatherData;
+export default WeatherInfo;

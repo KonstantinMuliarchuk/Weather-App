@@ -1,4 +1,4 @@
-import {useCallback} from 'react';
+import {memo, useCallback} from 'react';
 import {StyleSheet, TouchableOpacity} from 'react-native';
 import {Typography} from '../../../ui';
 import {CityItemProps} from './types';
@@ -20,4 +20,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CityItem;
+export default memo(CityItem);

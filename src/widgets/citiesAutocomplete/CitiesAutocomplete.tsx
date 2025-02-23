@@ -1,13 +1,18 @@
 import React, {memo} from 'react';
-import {View, TextInput, FlatList, StyleSheet} from 'react-native';
+import {
+  View,
+  TextInput,
+  FlatList,
+  StyleSheet,
+  ActivityIndicator,
+} from 'react-native';
 import {CitiesAutocompleteProps, City} from './types';
-import {useCityAutocomplete} from './useCityAutocomplete';
+import {useCitiesAutocomplete} from './useCitiesAutocomplete';
 import {CityItem} from './components';
 
-function CityAutocomplete(props: CitiesAutocompleteProps) {
-  const {cities, query, handleOnChangeText, onCityPress} = useCityAutocomplete(
-    props.onChooseCity,
-  );
+function CitiesAutocomplete(props: CitiesAutocompleteProps) {
+  const {cities, query, onChangeText, onCityPress, isLoading} =
+    useCitiesAutocomplete(props.onChooseCity);
 
   const renderItem = ({item}: {item: City}) => {
     return (
@@ -26,15 +31,21 @@ function CityAutocomplete(props: CitiesAutocompleteProps) {
       <TextInput
         placeholder="Search for a city"
         value={query}
-        onChangeText={handleOnChangeText}
+        onChangeText={onChangeText}
         style={styles.input}
       />
-      <FlatList
-        style={styles.list}
-        data={cities}
-        keyExtractor={item => item.place_id.toString()}
-        renderItem={renderItem}
-      />
+      {isLoading ? (
+        <View style={styles.listLoadingState}>
+          <ActivityIndicator size="large" />
+        </View>
+      ) : (
+        <FlatList
+          style={styles.list}
+          data={cities}
+          keyExtractor={item => item.place_id.toString()}
+          renderItem={renderItem}
+        />
+      )}
     </View>
   );
 }
@@ -59,8 +70,13 @@ const styles = StyleSheet.create({
   },
   list: {
     width: '100%',
-    backgroundColor: 'white',
+    backgroundColor: '#f5f5f5',
+  },
+  listLoadingState: {
+    paddingVertical: 20,
+    width: '100%',
+    backgroundColor: '#f5f5f5',
   },
 });
 
-export default memo(CityAutocomplete);
+export default memo(CitiesAutocomplete);

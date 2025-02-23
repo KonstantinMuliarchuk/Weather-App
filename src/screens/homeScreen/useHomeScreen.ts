@@ -13,7 +13,6 @@ export const useHomeScreen = () => {
 
   const onChooseCity = useCallback(async (lat: string, lon: string) => {
     const params = `?key=${apiKey}&q=${lat},${lon}`;
-    console.log('params', params);
 
     try {
       const response = await fetch(baseUrl + paths.forecast + params);

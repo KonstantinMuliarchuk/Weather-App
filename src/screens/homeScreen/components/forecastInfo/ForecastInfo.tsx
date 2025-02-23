@@ -1,13 +1,10 @@
 import {Image, StyleSheet, View} from 'react-native';
-import {Weather} from '../../types';
 import {Typography} from '../../../../ui';
-import {useForecastData} from './useForecastData';
+import {useForecastInfo} from './useForecastInfo';
+import {ForecastInfoProps} from './types';
 
-type Props = {
-  hours: Weather[];
-};
-function ForecastData(props: Props) {
-  const filteredHours = useForecastData(props.hours);
+function ForecastInfo(props: ForecastInfoProps) {
+  const filteredHours = useForecastInfo(props.hours);
 
   return (
     <View style={styles.container}>
@@ -57,4 +54,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ForecastData;
+export default ForecastInfo;

@@ -1,8 +1,8 @@
 import React from 'react';
 import {View, StyleSheet} from 'react-native';
 import {useHomeScreen} from './useHomeScreen';
-import {CitiesAutocomplete} from '../../widgets/citiesAutocomplete';
-import {WeatherData, ForecastData} from './components';
+import {CitiesAutocomplete} from '../../widgets';
+import {WeatherInfo, ForecastInfo} from './components';
 import {Typography} from '../../ui';
 
 const HomeScreen: React.FC = () => {
@@ -11,7 +11,7 @@ const HomeScreen: React.FC = () => {
   return (
     <View style={styles.container}>
       {weatherData ? (
-        <WeatherData
+        <WeatherInfo
           cityName={weatherData.location.name}
           countryName={weatherData.location.country}
           temperature={weatherData.current.temp_c}
@@ -27,8 +27,8 @@ const HomeScreen: React.FC = () => {
         </View>
       )}
 
-      {weatherData ? (
-        <ForecastData hours={weatherData.forecast.forecastday[0].hour} />
+      {weatherData?.forecast.forecastday.length ? (
+        <ForecastInfo hours={weatherData.forecast.forecastday[0].hour} />
       ) : null}
 
       <CitiesAutocomplete onChooseCity={onChooseCity} />
