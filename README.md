@@ -105,12 +105,6 @@ npx react-native run-android
 
 ---
 
-## 📸 Screenshots (Optional)
-
-_Add some app screenshots here_
-
----
-
 ## 📜 License
 
 This project is licensed under the MIT License.
