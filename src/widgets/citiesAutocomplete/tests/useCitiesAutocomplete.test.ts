@@ -44,36 +44,28 @@ describe('useCitiesAutocomplete', () => {
   });
 
   it('should fetch cities when query is at least 2 characters', async () => {
-    const {result, waitFor} = renderHook(() =>
-      useCitiesAutocomplete(jest.fn()),
-    );
+    const {result} = renderHook(() => useCitiesAutocomplete(jest.fn()));
 
-    act(() => {
-      result.current.onChangeText('New');
+    await act(async () => {
+      await result.current.onChangeText('New');
     });
 
     // Wait for the hook's state updates
-    await waitFor(() => {
-      expect(fetch).toHaveBeenCalledTimes(1);
-      //   expect(result.current.cities.length).toBe(1);
-      //   expect(result.current.isLoading).toBe(false);
-    });
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(result.current.cities.length).toBe(1);
+    expect(result.current.isLoading).toBe(false);
   });
 
   it('should handle errors when fetch fails', async () => {
     global.fetch = jest.fn(() => Promise.reject(new Error('Network error')));
 
-    const {result, waitFor} = renderHook(() =>
-      useCitiesAutocomplete(jest.fn()),
-    );
+    const {result} = renderHook(() => useCitiesAutocomplete(jest.fn()));
 
     act(() => {
       result.current.onChangeText('Los');
     });
 
-    await waitFor(() => {
-      expect(result.current.cities).toEqual([]);
-    });
+    expect(result.current.cities).toEqual([]);
   });
 
   it('should call onChooseCity when a city is selected', () => {

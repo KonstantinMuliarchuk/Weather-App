@@ -5,7 +5,7 @@ export type Weather = {
     text: string;
     icon: string;
   };
-  time: number;
+  time: number | Date;
   humidity: number;
   wind_kph: number;
 };
