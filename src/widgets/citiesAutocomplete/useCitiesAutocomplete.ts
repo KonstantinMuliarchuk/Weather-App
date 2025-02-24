@@ -1,5 +1,6 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {City} from './types';
+import {Alert} from 'react-native';
 
 const BASE_API_URL = 'https://nominatim.openstreetmap.org/search';
 
@@ -37,7 +38,7 @@ export const useCitiesAutocomplete = (
         }
       } catch (error) {
         setIsLoading(false);
-        console.error('Error fetching cities:', error);
+        Alert.alert('Error', 'Could not fetch cities');
       }
     };
     fetchCities();
