@@ -47,7 +47,7 @@ export const useCitiesAutocomplete = (
     fetchCities();
 
     return () => {
-      // cancel request in case we have new query value
+      // cancel request in case we have new query value or screen unmounts
       abortRequest(REQUEST_KEY);
     };
   }, [query]);
