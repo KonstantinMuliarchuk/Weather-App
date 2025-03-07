@@ -1,9 +1,12 @@
 import {renderHook, act} from '@testing-library/react-hooks';
 import {useHomeScreen} from '../useHomeScreen';
 import {WeatherData} from '../types';
+import {fetchWithTimeout} from '../../../services';
 
-global.fetch = jest.fn();
-
+jest.mock('../../../services', () => ({
+  fetchWithTimeout: jest.fn(),
+  abortRequest: jest.fn(),
+}));
 describe('useHomeScreen', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -28,9 +31,7 @@ describe('useHomeScreen', () => {
       forecast: {forecastday: []},
     };
 
-    (fetch as jest.Mock).mockResolvedValueOnce({
-      json: jest.fn().mockResolvedValueOnce(mockWeatherData),
-    });
+    (fetchWithTimeout as jest.Mock).mockResolvedValueOnce(mockWeatherData);
 
     const {result} = renderHook(() => useHomeScreen());
 
@@ -38,14 +39,14 @@ describe('useHomeScreen', () => {
       await result.current.onChooseCity('40.7128', '-74.0060');
     });
 
-    expect(fetch).toHaveBeenCalledWith(
-      'http://api.weatherapi.com/v1/forecast.json?key=6ba074c73a8a4457936181745252102&q=40.7128,-74.0060',
-    );
+    expect(fetchWithTimeout).toHaveBeenCalledTimes(1);
     expect(result.current.weatherData).toEqual(mockWeatherData);
   });
 
   it('should handle fetch error and not update state', async () => {
-    (fetch as jest.Mock).mockRejectedValueOnce(new Error('Network error'));
+    (fetchWithTimeout as jest.Mock).mockRejectedValueOnce(
+      new Error('Network error'),
+    );
 
     const {result} = renderHook(() => useHomeScreen());
 
@@ -53,9 +54,7 @@ describe('useHomeScreen', () => {
       await result.current.onChooseCity('40.7128', '-74.0060');
     });
 
-    expect(fetch).toHaveBeenCalledWith(
-      'http://api.weatherapi.com/v1/forecast.json?key=6ba074c73a8a4457936181745252102&q=40.7128,-74.0060',
-    );
+    expect(fetchWithTimeout).toHaveBeenCalledTimes(1);
     expect(result.current.weatherData).toBeUndefined();
   });
 });

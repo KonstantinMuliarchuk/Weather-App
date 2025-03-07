@@ -11,7 +11,7 @@ function ForecastInfo(props: ForecastInfoProps) {
       <Typography type="h4">Forecast for next 5 hours</Typography>
       <View style={styles.contentContainer}>
         {filteredHours.map(hour => (
-          <View style={styles.hour} key={hour.key}>
+          <View key={hour.key.toString()} style={styles.hour}>
             <Typography type="h4">{hour.time}</Typography>
             <Image style={styles.icon} source={{uri: hour.icon}} />
             <Typography type="h4">{hour.temperature}°</Typography>

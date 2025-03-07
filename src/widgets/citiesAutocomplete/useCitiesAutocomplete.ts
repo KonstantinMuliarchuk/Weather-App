@@ -1,8 +1,10 @@
 import {useCallback, useEffect, useRef, useState} from 'react';
 import {City} from './types';
 import {Alert} from 'react-native';
+import {abortRequest, fetchWithTimeout} from '../../services';
 
 const BASE_API_URL = 'https://nominatim.openstreetmap.org/search';
+const REQUEST_KEY = 'citiesRequest';
 
 export const useCitiesAutocomplete = (
   onChooseCity: (_lat: string, _lon: string) => void,
@@ -21,30 +23,32 @@ export const useCitiesAutocomplete = (
   }, []);
 
   useEffect(() => {
-    let isLatest = true;
     if (query.length < 2 || isCityChosen.current) return;
 
     const fetchCities = async () => {
       try {
         setIsLoading(true);
-        const response = await fetch(
-          `${BASE_API_URL}?city=${query}&format=json&limit=5&accept-language=en`,
+        const url = `${BASE_API_URL}?city=${query}&format=json&limit=5&accept-language=en`;
+        const data = await fetchWithTimeout<City[]>(
+          url,
+          undefined,
+          3000,
+          REQUEST_KEY,
         );
-        const data: City[] = await response.json();
-        // Only update after latest request has response
-        if (isLatest) {
-          setCities(data);
-          setIsLoading(false);
-        }
+        setCities(data);
+        setIsLoading(false);
       } catch (error) {
         setIsLoading(false);
-        Alert.alert('Error', 'Could not fetch cities');
+        // avoid showing alert in case if request was canceled
+        if (error instanceof Error && error.name === 'AbortError') return;
+        Alert.alert('Error', `${error}`);
       }
     };
     fetchCities();
 
     return () => {
-      isLatest = false;
+      // cancel request in case we have new query value
+      abortRequest(REQUEST_KEY);
     };
   }, [query]);
 

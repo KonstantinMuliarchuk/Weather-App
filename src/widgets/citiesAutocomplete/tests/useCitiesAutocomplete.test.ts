@@ -1,14 +1,11 @@
 import {renderHook, act} from '@testing-library/react-hooks';
 import {useCitiesAutocomplete} from '../useCitiesAutocomplete';
+import {fetchWithTimeout} from '../../../services';
 
-global.fetch = jest.fn(() => {
-  return Promise.resolve({
-    json: () =>
-      Promise.resolve([
-        {display_name: 'New York, USA', lat: '40.7128', lon: '-74.0060'},
-      ]),
-  });
-}) as jest.Mock;
+jest.mock('../../../services', () => ({
+  fetchWithTimeout: jest.fn(),
+  abortRequest: jest.fn(),
+}));
 
 describe('useCitiesAutocomplete', () => {
   beforeEach(() => {
@@ -40,18 +37,28 @@ describe('useCitiesAutocomplete', () => {
       result.current.onChangeText('N'); // One character, should not trigger fetch
     });
 
-    expect(fetch).not.toHaveBeenCalled();
+    expect(fetchWithTimeout).not.toHaveBeenCalled();
   });
 
   it('should fetch cities when query is at least 2 characters', async () => {
+    (fetchWithTimeout as jest.Mock).mockImplementation(() => {
+      return Promise.resolve([
+        {
+          display_name: 'New York, USA',
+          lat: '40.7128',
+          lon: '-74.0060',
+        },
+      ]);
+    });
+
     const {result} = renderHook(() => useCitiesAutocomplete(jest.fn()));
 
     await act(async () => {
-      await result.current.onChangeText('New');
+      result.current.onChangeText('New');
     });
 
     // Wait for the hook's state updates
-    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetchWithTimeout).toHaveBeenCalledTimes(1);
     expect(result.current.cities.length).toBe(1);
     expect(result.current.isLoading).toBe(false);
   });
